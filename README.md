@@ -48,7 +48,7 @@ python manage.py runserver
 
 ## 🔐 5. Tài khoản mẫu
 - Admin: admin / 123456
-- User:  / 123456
+- User: thanh@gmail.com / 123456
 ## 6. URL tham khảo
 - Trang chủ: http://127.0.0.1:8000 
 - Admin: http://127.0.0.1:8000/admin/ 
