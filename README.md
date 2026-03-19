@@ -52,4 +52,4 @@ python manage.py runserver
 ## 6. URL tham khảo
 - Trang chủ: http://127.0.0.1:8000 
 - Admin: http://127.0.0.1:8000/admin/ 
-- Đặt dịch vụ: http://127.0.0.1:8000/booking/
+- Dịch vụ: http: http://127.0.0.1:8000/service/
