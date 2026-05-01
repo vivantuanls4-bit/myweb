@@ -25,7 +25,9 @@
                             <tbody>
                                 {% for datCho in datCho_list %}
                                 <tr>
-                                    <td>{{ datCho.ma_tour.ten_tour }}</td>
+                                    <td>
+                                        <a href="{% url 'cart_detail' datCho.ma_dat_cho %}">{{ datCho.ma_tour.ten_tour }}</a>
+                                    </td>
                                     <td>{{ datCho.start_date|date:"d/m/Y" }}</td>
                                     <td>{{ datCho.end_date|date:"d/m/Y" }}</td>
                                     <td>

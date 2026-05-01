@@ -105,13 +105,13 @@ class DatCho(models.Model):
     ma_tour = models.ForeignKey(TourDuLich, on_delete=models.CASCADE, related_name='dat_cho_list')
     ngay_dat = models.DateTimeField(auto_now_add=True)
     start_date = models.DateField()
-    end_date = models.DateField()
+    end_date = models.DateField() # xóa
     trang_thai = models.CharField(max_length=20, choices=[
         ('pending', 'Đang chờ'),
         ('confirmed', 'Đã xác nhận'),
         ('cancelled', 'Đã hủy'),
     ], default='pending')
-
+    # ghi chú
     def __str__(self):
         return f"Đặt chỗ {self.ma_dat_cho} - {self.ma_nguoi_dung}"
 

@@ -28,12 +28,19 @@ class BookingForm(forms.ModelForm):
         cleaned_data = super().clean()
         start_date = cleaned_data.get('start_date')
         end_date = cleaned_data.get('end_date')
+        ma_tour = cleaned_data.get('ma_tour')
 
         if start_date and end_date:
             if end_date < start_date:
                 raise forms.ValidationError('Ngày về phải lớn hơn hoặc bằng ngày đi.')
             if start_date < date.today():
                 raise forms.ValidationError('Ngày khởi hành phải là ngày hôm nay hoặc tương lai.')
+
+            # Kiểm tra số ngày tour
+            if ma_tour:
+                so_ngay = (end_date - start_date).days + 1
+                if so_ngay != ma_tour.thoi_gian:
+                    raise forms.ValidationError(f'Số ngày của tour phải đúng bằng {ma_tour.thoi_gian} ngày!')
 
         return cleaned_data
 

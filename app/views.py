@@ -60,6 +60,18 @@ def cart(request):
     datCho_list = DatCho.objects.filter(ma_nguoi_dung=request.user).order_by('-ngay_dat')
     return render(request,'app/cart.html', {'datCho_list': datCho_list})
 
+#chi tiết giỏ hàng
+def cart_detail(request, ma_dat_cho):
+    dat_cho = get_object_or_404(DatCho, pk=ma_dat_cho)
+    tour = dat_cho.ma_tour
+    # Lấy tên địa điểm đầu tiên (nếu có)
+    dia_diem = tour.ma_dia_diem.first() if tour.ma_dia_diem.exists() else None
+    return render(request, 'app/cart_detail.html', {
+        'dat_cho': dat_cho,
+        'tour': tour,
+        'dia_diem': dia_diem,
+    })
+
 #thanh toán
 @login_required
 def booking(request):

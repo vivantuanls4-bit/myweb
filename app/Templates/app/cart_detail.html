@@ -1,0 +1,26 @@
+{% extends 'app/base.html' %}
+{% block cart_content %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Chi tiết đặt chỗ</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Mã đặt chỗ:</strong> {{ dat_cho.ma_dat_cho }}</p>
+        <p><strong>Tên tour:</strong> {{ tour.ten_tour }}</p>
+        <p><strong>Tên địa điểm:</strong> {% if dia_diem %}{{ dia_diem.ten_dia_diem }}{% else %}Không có địa điểm{% endif %}</p>
+        <p><strong>Ngày đi:</strong> {{ dat_cho.start_date|date:"d/m/Y" }}</p>
+        <p><strong>Ngày về:</strong> {{ dat_cho.end_date|date:"d/m/Y" }}</p>
+        <p><strong>Ngày đặt:</strong> {{ dat_cho.ngay_dat|date:"d/m/Y H:i" }}</p>
+        <p><strong>Trạng thái:</strong> 
+            {% if dat_cho.trang_thai == 'pending' %}
+                <span class="badge bg-warning">Đang chờ</span>
+            {% elif dat_cho.trang_thai == 'confirmed' %}
+                <span class="badge bg-success">Đã xác nhận</span>
+            {% elif dat_cho.trang_thai == 'cancelled' %}
+                <span class="badge bg-danger">Đã hủy</span>
+            {% endif %}
+        </p>
+        <a class="btn btn-outline-dark" href="{% url 'gioHang' %}">← Quay về danh sách</a>
+    </div>
+</div>
+{% endblock %}

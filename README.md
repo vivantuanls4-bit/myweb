@@ -25,11 +25,14 @@ Dự án nhằm xây dựng một hệ thống website giới thiệu du lịch 
 
 ## ⚙️ 4. Hướng dẫn cài đặt 
 
-### Cài đặt python và Django
+### Cài đặt python, Django và thư viện
 pip install django
+
+pip install reportlab
 
 ### Tạo projiect Django
 django-admin startproject webDuLich
+
 sau đó ta vào terminal gõ câu lệnh cd webDuLich để vào vị trí tệp webDuLich
 
 ### Tạo APP
@@ -48,16 +51,8 @@ python manage.py runserver
 
 ## 🔐 5. Tài khoản mẫu
 - Admin: admin / 123456
-<<<<<<< HEAD
 - User: thanh@gmail.com / 123456
 ## 6. URL tham khảo
 - Trang chủ: http://127.0.0.1:8000 
 - Admin: http://127.0.0.1:8000/admin/ 
-- Dịch vụ: http: http://127.0.0.1:8000/service/
-=======
-- User:  / 123456
-## 6. URL tham khảo
-- Trang chủ: http://127.0.0.1:8000 
-- Admin: http://127.0.0.1:8000/admin/ 
 - Đặt dịch vụ: http://127.0.0.1:8000/booking/
->>>>>>> d24e3d8 (update UI)
