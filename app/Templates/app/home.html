@@ -54,16 +54,22 @@
 {% block main_content %}
 <!--<div class='row' style="width:100%">-->
 <div class="row">
-{% for diemden in diemDuLich %}
+{% for diaDiem in diaDiem %}
     <div class="col-lg-4 mb-4">
         <div class="card h-100">
-            <img class="card-img-top thumbnail" src="{{ diemden.hinhAnhURL }}" alt="{{ diemden.ten }}">
+            <a href="{% url 'chiTietDiem' diaDiem.ma_dia_diem %}">
+              <img class="card-img-top thumbnail" src="{{ diaDiem.anh_dai_dien_url }}" alt="{{ diaDiem.ten_dia_diem }}">
+            </a>
 
             <div class="card-body">
-                <h5 class="card-title"><strong> {{ diemden.ten }}</strong></h5>
+                <h5 class="card-title">
+                  <a href="{% url 'chiTietDiem' diaDiem.ma_dia_diem %}" style="color:inherit; text-decoration:none;">
+                    <strong>{{ diaDiem.ten_dia_diem }}</strong>
+                  </a>
+                </h5>
 
                 <p class="card-text mo-ta text-collapse">
-                  {{ diemden.moTa }}
+                  {{ diaDiem.mo_ta }}
                 </p>
                 
                 <span class="xem-them" onclick="toggleMoTa(this)">Xem thêm</span>

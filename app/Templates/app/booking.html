@@ -2,32 +2,51 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
-{% block conten_booking %}
-<h1>ĐIỂM DU LỊCH</h1>
+{% block content_booking %}
 
-<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
-    {% for diendem in diemDuLich %}
-    <div style="border:1px solid #ccc; padding:10px; border-radius:6px;">
+<div class="page-wrapper">
+    <div class="checkout-form-container box-element">
+        
+        <h2>Thông tin đặt chỗ</h2>
 
-        <img src="{{ diendem.hinhAnhURL }}"
-            style="width:100%; height:200px; object-fit:cover; border-radius:6px;">
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-        <h5 style="margin-top:10px;">
-            <strong>{{ diendem.ten }}</strong>
-        </h5>
+        <form method="post">
+            {% csrf_token %}
 
-        <p class="mo-ta text-collapse">
-            {{ diendem.mo_ta }}
-        </p>
+            {{ form.non_field_errors }}
 
-        <span class="xem-them" onclick="toggleMoTa(this)">Xem thêm</span>
-        <br>
+            <div class="form-group">
+                <label>Chọn tour*</label>
+                {{ form.ma_tour.errors }}
+                {{ form.ma_tour }}
+            </div>
 
-        <a href="{% url 'chiTietDiem' diendem.id %}">Xem chi tiết</a> |
-        <a href="{% url 'gioHang' %}">Dịch vụ</a>
+            <div class="form-group">
+                <label>Chọn ngày đi*</label>
+                {{ form.start_date.errors }}
+                {{ form.start_date }}
+            </div>
+
+            <div class="form-group">
+                <label>Chọn ngày về*</label>
+                {{ form.end_date.errors }}
+                {{ form.end_date }}
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                Xác nhận đặt chỗ
+            </button>
+
+        </form>
 
     </div>
-    {% endfor %}
 </div>
-</br></br></br>
-{% endblock conten_booking %}
+
+{% endblock content_booking %}

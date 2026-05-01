@@ -1,0 +1,56 @@
+<!--trang tìm kiếm-->
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block banner_slider %}
+<div class="container mt-4">
+    <h2>Kết quả tìm kiếm cho: "{{ query }}"</h2>
+    {% if not diaDiem_results and not tourDuLich_results %}
+        <p>Không tìm thấy kết quả nào.</p>
+    {% endif %}
+</div>
+{% endblock banner_slider %}
+
+{% block main_content %}
+<div class="container">
+    {% if diaDiem_results %}
+        <h3>Địa điểm du lịch</h3>
+        <div class="row">
+            {% for diaDiem in diaDiem_results %}
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <img class="card-img-top thumbnail" src="{{ diaDiem.anh_dai_dien_url }}" alt="{{ diaDiem.ten_dia_diem }}">
+                        <div class="card-body">
+                            <h5 class="card-title"><strong>{{ diaDiem.ten_dia_diem }}</strong></h5>
+                            <p class="card-text mo-ta text-collapse">{{ diaDiem.mo_ta }}</p>
+                            <span class="xem-them" onclick="toggleMoTa(this)">Xem thêm</span>
+                            <p><strong>Địa chỉ:</strong> {{ diaDiem.dia_chi }}</p>
+                            <a class="btn btn-primary" href="{% url 'chiTietDiem' diaDiem.ma_dia_diem %}">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if tourDuLich_results %}
+        <h3>Tour du lịch</h3>
+        <div class="row">
+            {% for tour in tourDuLich_results %}
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><strong>{{ tour.ten_tour }}</strong></h5>
+                            <p><strong>Thời gian:</strong> {{ tour.thoi_gian }} ngày</p>
+                            <p><strong>Giá tour:</strong> {{ tour.gia }} VND</p>
+                            <p><strong>Địa điểm du lịch:</strong> {{ tour.ma_dia_diem.ten_dia_diem }}</p>
+                            <a class="btn btn-primary" href="{% url 'chiTietDiem' tour.ma_dia_diem.ma_dia_diem %}">Xem địa điểm du lịch</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+<br/><br/><br/>
+{% endblock main_content %}

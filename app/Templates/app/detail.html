@@ -2,27 +2,31 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
-{% block conten_booking %}
+{% block content_booking %}
 
-<h2>{{ diem.ten }}</h2>
+<h2>{{ diem.ten_dia_diem }}</h2>
+{% if user.is_staff %}
+    <a href="{% url 'edit_dia_diem' diem.ma_dia_diem %}" class="btn btn-warning btn-sm">Chỉnh Sửa</a>
+{% endif %}
 <p>
-    {{ diem.diaChi }}
+    {{ diem.dia_chi }}
 </p>
 
-{% if diem.hinhAnh %}
-    <img src="{{ diem.hinhAnh.url }}" alt="{{ diem.ten }}" width="400">
+{% if diem.anh_dai_dien %}
+    <img src="{{ diem.anh_dai_dien.url }}" alt="{{ diem.ten_dia_diem }}" width="400">
 {% else %}
     <p>Chưa có hình ảnh</p>
 {% endif %}
 
 <p>
-    {{ diem.moTa }}
+    {{ diem.mo_ta }}
 </p>
 
-<p><strong>Giá tham khảo:</strong>
-    {{ diem.giaThamKhao }} VNĐ
-</p>
-<a href="{% url 'gioHang' %}">Dịch vụ</a>
+
+<div class="mb-3">
+    <a href="{% url 'datDichVu' %}" class="btn btn-outline-success btn-sm me-2">Dịch vụ</a>
+    <a href="{% url 'thanhToan' %}?dia_diem_id={{ diem.ma_dia_diem }}" class="btn btn-primary btn-sm" style="width:auto; min-width:80px;">Đặt tour</a>
+</div>
 
 
 <!-- ===== FORM ĐÁNH GIÁ ===== -->
@@ -33,11 +37,11 @@
     {% csrf_token %}
 
     <label>Xếp hạng:</label><br>
-    {{ form.soSao }}
+    {{ form.so_sao }}
 
     <br><br>
     <label>Nội dung đánh giá:</label><br>
-    {{ form.noiDungBinhLuan }}
+    {{ form.noi_dung_binh_luan }}
 
     <br><br>
     <button type="submit" class="btn btn-primary">
@@ -57,21 +61,21 @@
 
 {% for dg in danhGiaList %}
 <div style="border-bottom:1px solid #ddd; padding:10px 0">
-    <strong>{{ dg.nguoiDung.username }}</strong>
+    <strong>{{ dg.ma_nguoi_dung.username }}</strong>
     <span>
         {% for i in "12345" %}
-            {% if forloop.counter <= dg.soSao %}
+            {% if forloop.counter <= dg.so_sao %}
                 ⭐
             {% endif %}
         {% endfor %}
     </span>
 
-    <p>{{ dg.noiDungBinhLuan }}</p>
-    <small>{{ dg.ngayDanhGia|date:"d/m/Y H:i" }}</small>
+    <p>{{ dg.noi_dung_binh_luan }}</p>
+    <small>{{ dg.ngay_danh_gia|date:"d/m/Y H:i" }}</small>
 </div>
 {% empty %}
 <p>Chưa có đánh giá nào.</p>
 {% endfor %}
 
 </br></br></br>
-{% endblock conten_booking %}
+{% endblock content_booking %}

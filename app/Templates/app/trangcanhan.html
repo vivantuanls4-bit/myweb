@@ -1,0 +1,228 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Thông tin cá nhân</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Tên đăng nhập:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Họ tên:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                    <p><strong>Ngày tham gia:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+                    {% if user.is_staff %}
+        <a href="{% url 'admin:index' %}" class="btn btn-primary mt-3">Quản lý</a>
+        <a href="{% url 'manage_requests' %}" class="btn btn-warning mt-3 position-relative">
+            Quản Lý Yêu Cầu
+            {% if pending_request_count and pending_request_count > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ pending_request_count }}
+                </span>
+            {% endif %}
+        </a>
+    {% endif %}
+    {% if not user.is_staff %}
+        {% if can_request_report_permission %}
+            <form method="post" action="{% url 'request_report_permission' %}" class="d-inline mt-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Yêu cầu cấp quyền xem báo cáo</button>
+            </form>
+        {% elif has_report_permission %}
+            <span class="badge bg-success d-inline-block mt-3">Đã có quyền xem báo cáo</span>
+        {% elif has_pending_report_permission_request %}
+            <span class="badge bg-warning d-inline-block mt-3">Yêu cầu cấp quyền đang chờ</span>
+        {% endif %}
+    {% endif %}
+    <a href="{% url 'create_dia_diem' %}" class="btn btn-success mt-3">Tạo Địa Điểm Mới</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Lịch sử đặt tour</h5>
+                </div>
+                <div class="card-body">
+                    {% if dat_cho_list %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tour</th>
+                                        <th>Ngày đi</th>
+                                        <th>Ngày về</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for datCho in dat_cho_list %}
+                                    <tr>
+                                        <td>{{ datCho.ma_tour.ten_tour }}</td>
+                                        <td>{{ datCho.start_date|date:"d/m/Y" }}</td>
+                                        <td>{{ datCho.end_date|date:"d/m/Y" }}</td>
+                                        <td>
+                                            {% if datCho.trang_thai == 'pending' %}
+                                                <span class="badge bg-warning">Đang chờ</span>
+                                            {% elif datCho.trang_thai == 'confirmed' %}
+                                                <span class="badge bg-success">Đã xác nhận</span>
+                                            {% elif datCho.trang_thai == 'cancelled' %}
+                                                <span class="badge bg-danger">Đã hủy</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>Bạn chưa đặt chỗ nào.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Đánh giá của bạn</h5>
+                </div>
+                <div class="card-body">
+                    {% if danhGia_list %}
+                        {% for danhGia in danhGia_list %}
+                        <div class="border-bottom pb-3 mb-3">
+                            <h6>{{ danhGia.ma_dia_diem.ten_dia_diem }}</h6>
+                            <p>
+                                {% for i in "12345"|make_list %}
+                                    {% if i <= danhGia.so_sao %}
+                                        <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <small class="text-muted">{{ danhGia.ngay_danh_gia|date:"d/m/Y H:i" }}</small>
+                            </p>
+                            <p>{{ danhGia.noi_dung_binh_luan }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Bạn chưa đánh giá địa điểm nào.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Yêu cầu</h5>
+                </div>
+                <div class="card-body">
+                    {% if not user.is_staff %}
+                        <h6 class="mb-3">Yêu cầu tạo địa điểm</h6>
+                        {% if user.request_list.all %}
+                            {% for req in user.request_list.all %}
+                                <div class="border-bottom pb-3 mb-3">
+                                    <span class="badge bg-info mb-2">Tạo địa điểm</span>
+                                    <h6>{{ req.ten_dia_diem }}</h6>
+                                    <p>Trạng thái:
+                                        {% if req.trang_thai == 'pending' %}
+                                            <span class="badge bg-warning">Đang chờ</span>
+                                        {% elif req.trang_thai == 'approved' %}
+                                            <span class="badge bg-success">Đã chấp nhận</span>
+                                        {% elif req.trang_thai == 'rejected' %}
+                                            <span class="badge bg-danger">Đã từ chối</span>
+                                        {% endif %}
+                                    </p>
+                                    {% if req.ly_do_tu_choi %}
+                                        <p>Lý do từ chối: {{ req.ly_do_tu_choi }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Bạn chưa gửi yêu cầu tạo địa điểm.</p>
+                        {% endif %}
+
+                        <h6 class="mt-4 mb-3">Yêu cầu cấp quyền xem báo cáo</h6>
+                        {% if user_report_permission_requests %}
+                            {% for req in user_report_permission_requests %}
+                                <div class="border-bottom pb-3 mb-3">
+                                    <span class="badge bg-secondary mb-2">Cấp quyền báo cáo</span>
+                                    <p>Ngày yêu cầu: {{ req.ngay_tao|date:"d/m/Y H:i" }}</p>
+                                    <p>Trạng thái:
+                                        {% if req.trang_thai == 'pending' %}
+                                            <span class="badge bg-warning">Đang chờ</span>
+                                        {% elif req.trang_thai == 'approved' %}
+                                            <span class="badge bg-success">Đã chấp nhận</span>
+                                        {% elif req.trang_thai == 'rejected' %}
+                                            <span class="badge bg-danger">Đã từ chối</span>
+                                        {% endif %}
+                                    </p>
+                                    {% if req.ly_do_tu_choi %}
+                                        <p>Lý do từ chối: {{ req.ly_do_tu_choi }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Bạn chưa gửi yêu cầu cấp quyền xem báo cáo.</p>
+                        {% endif %}
+                    {% else %}
+                        <p>Admin có thể tạo địa điểm trực tiếp.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.is_staff %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Yêu cầu cấp quyền xem báo cáo</h5>
+                </div>
+                <div class="card-body">
+                    {% if report_permission_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Người yêu cầu</th>
+                                        <th>Email</th>
+                                        <th>Ngày yêu cầu</th>
+                                        <th>Loại yêu cầu</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in report_permission_requests %}
+                                    <tr>
+                                        <td>{{ req.ma_nguoi_dung.username }}</td>
+                                        <td>{{ req.ma_nguoi_dung.email }}</td>
+                                        <td>{{ req.ngay_tao|date:"d/m/Y H:i" }}</td>
+                                        <td><span class="badge bg-secondary">Cấp quyền báo cáo</span></td>
+                                        <td>
+                                            {% if req.trang_thai == 'pending' %}
+                                                <span class="badge bg-warning">Đang chờ</span>
+                                            {% elif req.trang_thai == 'approved' %}
+                                                <span class="badge bg-success">Đã chấp nhận</span>
+                                            {% elif req.trang_thai == 'rejected' %}
+                                                <span class="badge bg-danger">Đã từ chối</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if req.trang_thai == 'pending' %}
+                                                <a href="{% url 'approve_report_permission_request' req.ma_request %}" class="btn btn-sm btn-primary">Xử lý</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>Không có yêu cầu nào.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock main_content %}

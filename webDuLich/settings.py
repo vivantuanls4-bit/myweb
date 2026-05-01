@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'app',
     
 ]
-AUTH_USER_MODEL = 'app.User'
+AUTH_USER_MODEL = 'app.NguoiDung'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

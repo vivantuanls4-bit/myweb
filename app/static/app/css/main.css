@@ -98,6 +98,123 @@ TEXT / DESCRIPTION
     margin-top:6px;
 }
 
+/* =====================================================
+INTRODUCE PAGE STYLES
+===================================================== */
+
+.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 60px 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.hero.box-element {
+    background: #fff;
+    box-shadow: hsl(0,0%,80%) 0 0 16px;
+}
+
+.hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.hero-content div {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hero h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.hero > .hero-content > div > p:first-of-type {
+    color: #667eea;
+    font-size: 1.1em;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    color: #555;
+    line-height: 1.8;
+    font-size: 1em;
+}
+
+.section {
+    background: linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%);
+    padding: 50px 30px;
+    margin: 30px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.section.box-element {
+    background: #fff;
+    box-shadow: hsl(0,0%,80%) 0 0 16px;
+}
+
+.section h4 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2em;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 15px;
+}
+
+.section h5 {
+    color: #667eea;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    font-size: 1.3em;
+}
+
+.section p {
+    color: #666;
+    line-height: 1.8;
+    font-size: 1em;
+    margin-bottom: 15px;
+}
+
+/* =====================================================
+CTA SECTION
+===================================================== */
+
+.cta {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #4f868c 0%, #6ba292 100%);
+    color: white;
+    margin: 30px 0;
+    border-radius: 10px;
+}
+
+.cta h2 {
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.btn-home {
+    display: inline-block;
+    padding: 12px 24px;
+    background: white;
+    color: #4f868c;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-home:hover {
+    background: #f0f0f0;
+}
+
 .xem-them:hover{
     color:#157347;
     text-decoration:underline;
@@ -319,4 +436,46 @@ NOTICE PAGE
     font-size:18px;
     margin-bottom:25px;
     color:#f1f1f1;
+}
+
+
+
+.checkout-form-container {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.checkout-form-container h2 {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.form-group {
+    margin-bottom: 18px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.btn-primary {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background: #0056b3;
 }

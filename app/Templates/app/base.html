@@ -49,9 +49,9 @@
                         Dịch vụ
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'datDichVu' %}">Đặt dịch vụ</a></li>
-                            <li><a class="dropdown-item" href="#">Bài viết</a></li>
-                            <li><a class="dropdown-item"  href="#">Báo cáo</a></li>
+                            <li><a class="dropdown-item" href="{% url 'datDichVu' %}">Dịch vụ</a></li>
+                            <li><a class="dropdown-item" href="{% url 'baoCao' %}">Báo cáo</a></li>
+                            <li><a class="dropdown-item"  href="#">Bài viết</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -64,8 +64,8 @@
                         <a class="nav-link" href="{%url "lienHe" %}">Liên hệ</a>
                     </li>
                 </ul>
-                    <form class="d-flex" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+                    <form class="d-flex" role="search" action="{% url 'timKiem' %}" method="get">
+                        <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search"/>
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
             
@@ -76,10 +76,10 @@
                 {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                {{ user.username }}
+                                {{ user.first_name }}
                             </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Trang cá nhân</a></li>
+                            <li><a class="dropdown-item" href="{% url 'trangCaNhan' %}">Trang cá nhân</a></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a></li>
                         </ul>
                     </li>
@@ -100,11 +100,13 @@
     <!--giao dien-->
     <div class="container-xl py-4">
         {% block cart_content %}{% endblock cart_content %}
-        {% block content_checkout %}{% endblock content_checkout %}
+        {% block content_booking %}{% endblock content_booking %}
         {% block content_gioithieu %}{% endblock content_gioithieu %}
         {% block content_chinhsach %}{% endblock content_chinhsach %}
         {% block content_lienHe %}{% endblock content_lienHe %}
-        {%block conten_booking%}{%endblock conten_booking%}
+        {%block content_service%}{%endblock content_service%}
+        {% block content_report %}{% endblock content_report %}
+        {% block content_reviews %}{% endblock content_reviews %}
     </div>
     <!--chan trang-->
     <footer class="container-fluid bg-success text-center fixed-bottom p-2 mt-5">

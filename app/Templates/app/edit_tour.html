@@ -1,0 +1,67 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Chỉnh Sửa Tour Du Lịch{% endblock %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Chỉnh Sửa Tour: {{ tour.ten_tour }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.ten_tour.id_for_label }}" class="form-label">Tên Tour</label>
+                            {{ form.ten_tour }}
+                            {% if form.ten_tour.errors %}
+                                <div class="text-danger">{{ form.ten_tour.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.thoi_gian.id_for_label }}" class="form-label">Thời Gian (ngày)</label>
+                            {{ form.thoi_gian }}
+                            {% if form.thoi_gian.errors %}
+                                <div class="text-danger">{{ form.thoi_gian.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.gia.id_for_label }}" class="form-label">Giá</label>
+                            {{ form.gia }}
+                            {% if form.gia.errors %}
+                                <div class="text-danger">{{ form.gia.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.ma_dia_diem.id_for_label }}" class="form-label">Địa Điểm</label>
+                            {{ form.ma_dia_diem }}
+                            {% if form.ma_dia_diem.errors %}
+                                <div class="text-danger">{{ form.ma_dia_diem.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.anh_dai_dien.id_for_label }}" class="form-label">Ảnh Đại Diện</label>
+                            {{ form.anh_dai_dien }}
+                            {% if form.anh_dai_dien.errors %}
+                                <div class="text-danger">{{ form.anh_dai_dien.errors }}</div>
+                            {% endif %}
+                            {% if tour.anh_dai_dien %}
+                                <div class="mt-2">
+                                    <img src="{{ tour.anh_dai_dien.url }}" alt="Ảnh hiện tại" class="img-thumbnail" style="max-width: 200px;">
+                                    <p class="form-text">Ảnh hiện tại. Chọn file mới để thay đổi.</p>
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Chọn file ảnh để upload (JPG, PNG, GIF, v.v.)</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lưu Thay Đổi</button>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}

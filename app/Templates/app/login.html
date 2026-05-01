@@ -33,14 +33,11 @@
     <!-- Thông báo -->
     <p id="message" class="text-center text-sm mb-4 text-white"></p>
     {% if error %}
-      <p class="text-center text-sm mb-4 text-white
-          {% if mode == 'login' %}
-            text-red-300
-          {% else %}
-            text-yellow-300
-          {% endif %}">
-        {{ error }}
-      </p>
+      <div class="mb-4 p-3 bg-red-100 border-l-4 border-red-500 rounded">
+        <p class="text-red-700 font-semibold text-sm">
+          <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+        </p>
+      </div>
     {% endif %}
     <!-- Form -->
     <form id="authForm" class="space-y-4" method="post">

@@ -1,0 +1,72 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Quản Lý Yêu Cầu{% endblock %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h2>Yêu Cầu</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Người dùng</th>
+                            <th>Loại yêu cầu</th>
+                            <th>Tên địa điểm / Mô tả</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in requests %}
+                        <tr>
+                            <td>{{ item.obj.ma_nguoi_dung.username }}</td>
+                            <td>
+                                {% if item.type == 'create' %}
+                                    <span class="badge bg-info">{{ item.label }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ item.label }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.type == 'create' %}
+                                    {{ item.obj.ten_dia_diem }}
+                                {% else %}
+                                    Yêu cầu quyền xem báo cáo
+                                {% endif %}
+                            </td>
+                            <td>{{ item.obj.ngay_tao|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if item.obj.trang_thai == 'pending' %}
+                                    <span class="badge bg-warning">Đang chờ</span>
+                                {% elif item.obj.trang_thai == 'approved' %}
+                                    <span class="badge bg-success">Đã chấp nhận</span>
+                                {% elif item.obj.trang_thai == 'rejected' %}
+                                    <span class="badge bg-danger">Đã từ chối</span>
+                                {% elif item.obj.trang_thai == 'revoked' %}
+                                    <span class="badge bg-secondary">Đã thu hồi</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.type == 'create' and item.obj.trang_thai == 'pending' %}
+                                    <a href="{% url 'approve_request' item.obj.ma_request %}" class="btn btn-primary btn-sm">Xử lý</a>
+                                {% elif item.type == 'permission' %}
+                                    {% if item.obj.trang_thai == 'pending' %}
+                                        <a href="{% url 'approve_report_permission_request' item.obj.ma_request %}" class="btn btn-primary btn-sm">Xử lý</a>
+                                    {% elif item.obj.trang_thai == 'approved' %}
+                                        <a href="{% url 'revoke_report_permission' item.obj.ma_request %}" class="btn btn-danger btn-sm">Thu hồi</a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}

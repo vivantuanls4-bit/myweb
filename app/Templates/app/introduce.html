@@ -4,8 +4,10 @@
 
 {% block title %}Giới thiệu{% endblock title %}
 {% block content_gioithieu %}
+<div class="page-wrapper">
+
 <!-- HERO -->
-<section class="hero">
+<section class="hero box-element">
     <div class="hero-content">
         <div>
             <h4><strong>Giới thiệu về Website Du Lịch của Chúng Tôi</strong></h4>
@@ -27,7 +29,7 @@
         </div>
     </div>
 </section>
-<section class="hero">
+<section class="hero box-element">
     <div class="hero-content">
         <div>
             <h4><strong>Sứ mệnh và tầm nhìn</strong></h4>
@@ -46,11 +48,10 @@
             </p>
         </div>
     </div>
-
 </section>
 
 <!-- GIỚI THIỆU -->
-<section class="section">
+<section class="section box-element">
     <h4><strong>Website của chúng tôi có gì?</strong></h4>
     <h5><strong>1. Đặt phòng nhanh chóng và tiện lợi</strong></h5>
         <p>
@@ -98,7 +99,7 @@
         </p>
 </section>
 
-<section class="hero">
+<section class="hero box-element">
     <div class="hero-content">
         <div>
             <h4><strong>Cam kết của chúng tôi</strong></h4>
@@ -114,11 +115,11 @@
 
 </section>
 
-<section class="hero">
+<section class="hero box-element">
     <div class="hero-content">
         <div>
             <h4><strong>Kết luận</strong></h4>
-            <div class="page-wrapper">
+            <!--<div class="page-wrapper">-->
             <p>
                 Website du lịch của chúng tôi không chỉ là nơi cung cấp dịch vụ đặt phòng và đặt tour,
                 mà còn là cầu nối giữa du khách,
@@ -127,17 +128,18 @@
                 chúng tôi hy vọng sẽ mang đến cho bạn những trải nghiệm du lịch trọn vẹn, đáng nhớ và đầy cảm hứng.
                 Hãy để website của chúng tôi trở thành người bạn đồng hành tin cậy trên mọi hành trình khám phá của bạn.
             </p>
-            </div>
+            <!--</div>-->
         </div>
     </div>
 
 </section>
 <!-- CTA -->
-<section class="cta">
+<section class="cta box-element">
     <h2>Bắt đầu hành trình ngay hôm nay</h2>
     <a href="{% url 'home' %}" class="btn-home">
         Xem địa điểm du lịch
     </a>
 </section>
 <br><br><br>
+</div>
 {% endblock content_gioithieu %}

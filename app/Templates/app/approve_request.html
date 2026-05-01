@@ -1,0 +1,65 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Duyệt Yêu Cầu Tạo Địa Điểm{% endblock %}
+
+{% block main_content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Duyệt Yêu Cầu: {{ req.ten_dia_diem }}</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Người yêu cầu:</strong> {{ req.ma_nguoi_dung.username }}</p>
+                    <p><strong>Tên địa điểm:</strong> {{ req.ten_dia_diem }}</p>
+                    <p><strong>Mô tả:</strong> {{ req.mo_ta }}</p>
+                    <p><strong>Địa chỉ:</strong> {{ req.dia_chi }}</p>
+                    <p><strong>Danh mục:</strong> {{ req.ma_danh_muc.ten_danh_muc }}</p>
+                    {% if req.anh_dai_dien %}
+                        <p><strong>Ảnh đại diện:</strong></p>
+                        <img src="{{ req.anh_dai_dien.url }}" alt="Ảnh yêu cầu" class="img-thumbnail" style="max-width: 300px;">
+                    {% endif %}
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Hành động:</label><br>
+                            <input type="radio" name="action" value="approve" id="approve" required>
+                            <label for="approve">Chấp nhận</label><br>
+                            <input type="radio" name="action" value="reject" id="reject">
+                            <label for="reject">Từ chối</label>
+                        </div>
+                        <div class="mb-3" id="ly_do_div" style="display: none;">
+                            <label for="ly_do" class="form-label">Lý do từ chối:</label>
+                            <textarea name="ly_do" id="ly_do" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Xử lý</button>
+                        <a href="{% url 'manage_requests' %}" class="btn btn-secondary">Quay lại</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rejectRadio = document.getElementById('reject');
+    const lyDoDiv = document.getElementById('ly_do_div');
+    
+    rejectRadio.addEventListener('change', function() {
+        if (this.checked) {
+            lyDoDiv.style.display = 'block';
+        }
+    });
+    
+    document.querySelector('input[name="action"][value="approve"]').addEventListener('change', function() {
+        if (this.checked) {
+            lyDoDiv.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock main_content %}

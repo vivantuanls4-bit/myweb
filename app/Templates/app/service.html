@@ -1,0 +1,108 @@
+<!--Dịch Vụ-->
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content_service %}
+
+<div class="page-wrapper">
+    <div class="d-flex" style="gap:30px;">
+
+        <!-- SIDEBAR -->
+        <div style="width:300px; flex-shrink:0;">
+            <div class="box-element">
+                <h4 class="bg-dark text-white p-2">Bộ lọc</h4>
+
+                <form method="GET">
+
+                    <!-- Danh mục -->
+                    <div class="mb-3">
+                        <label>Danh mục</label>
+                        <select name="danhMuc" class="form-control">
+                            <option value="">Tất cả danh mục</option>
+                            {% for dm in danhMuc %}
+                                <option value="{{ dm.ma_danh_muc }}"
+                                    {% if request.GET.danhMuc == dm.ma_danh_muc|stringformat:"s" %}selected{% endif %}>
+                                    {{ dm.ten_danh_muc }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Sắp xếp -->
+                    <div class="mb-3">
+                        <label>Sắp xếp</label>
+                        <select name="sapXep" class="form-control">
+                            <option value="">Mặc định</option>
+                            <option value="moi">Mới nhất</option>
+                            <option value="cu">Cũ nhất</option>
+                        </select>
+                    </div>
+
+                    <!-- Tìm kiếm -->
+                    <div class="mb-3">
+                        <label>Tìm kiếm</label>
+                        <input type="text" name="q" class="form-control"
+                                placeholder="Tìm địa điểm..."
+                                value="{{ request.GET.q }}">
+                    </div>
+
+                    <!-- Button -->
+                    <button type="submit" class="btn btn-danger w-100 mb-2">
+                        Tìm kiếm
+                    </button>
+
+                    <a href="?" class="btn btn-success w-100">
+                        Xóa bộ lọc
+                    </a>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- 🔹 DANH SÁCH ĐỊA ĐIỂM -->
+        <div class="col-lg-9">
+            <h2>ĐIỂM DU LỊCH</h2>
+
+            <div class="row">
+                {% for diaDiem in diaDiem %}
+                <div class="col-lg-4">
+                    <div class="card card-dl">
+
+                        <img src="{{ diaDiem.anh_dai_dien_url }}" class="thumbnail">
+
+                        <div class="p-2">
+                            <h5 class="card-title">
+                                <strong>{{ diaDiem.ten_dia_diem }}</strong>
+                            </h5>
+
+                            <p class="mo-ta text-collapse">
+                                {{ diaDiem.mo_ta }}
+                            </p>
+
+                            <span class="xem-them" onclick="toggleMoTa(this)">
+                                Xem thêm
+                            </span>
+
+                            <hr>
+
+                            <a href="{% url 'chiTietDiem' diaDiem.ma_dia_diem %}" class="btn btn-outline-primary btn-sm">
+                                Chi tiết
+                            </a>
+
+                            <a href="{% url 'thanhToan' %}?dia_diem_id={{ diaDiem.ma_dia_diem }}"
+                                class="btn btn-outline-success btn-sm">
+                                Đặt dịch vụ
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock content_service %}

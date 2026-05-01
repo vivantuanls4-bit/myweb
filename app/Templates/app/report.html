@@ -1,0 +1,332 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Báo cáo thống kê{% endblock %}
+
+{% block content_report %}
+
+<div class="page-wrapper">
+    <h1 class="text-center mb-4">📊 Báo cáo thống kê</h1>
+
+    <!-- ERROR -->
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% if can_request_permission %}
+            <div class="mt-3">
+                {% if has_pending_request %}
+                    <button class="btn btn-warning" disabled>Yêu cầu cấp quyền đang chờ xử lý</button>
+                {% else %}
+                    <form method="POST" action="{% url 'request_report_permission' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Yêu cầu cấp quyền</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- FILTER -->
+    <form method="GET" class="row mb-4 g-2">
+
+        <div class="col-md-3">
+            <input type="date" name="start_date" value="{{ request.GET.start_date }}" class="form-control">
+        </div>
+
+        <div class="col-md-3">
+            <input type="date" name="end_date" value="{{ request.GET.end_date }}" class="form-control">
+        </div>
+
+        <div class="col-md-3">
+            <select name="diem" class="form-control">
+                <option value="">-- Tất cả địa điểm --</option>
+                {% for d in ds_diem %}
+                    <option value="{{ d.ma_dia_diem }}"
+                        {% if request.GET.diem == d.ma_dia_diem|stringformat:"s" %}selected{% endif %}>
+                        {{ d.ten_dia_diem }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select name="so_sao" class="form-control">
+                <option value="">-- Số sao --</option>
+                {% for i in "54321" %}
+                    <option value="{{ i }}"
+                        {% if request.GET.so_sao == i %}selected{% endif %}>
+                        {{ i }} sao
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-1 d-grid">
+            <button class="btn btn-primary">Lọc</button>
+        </div>
+    </form>
+
+    <!-- EXPORT -->
+    <div class="mb-3">
+        <button onclick="exportPDF()" class="btn btn-danger">
+            Xuất PDF
+        </button>
+    </div>
+
+    <!-- FORM ẨN CHO EXPORT PDF -->
+    <form id="exportForm" method="POST" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="export" value="pdf">
+        <input type="hidden" name="chart_month" id="chart_month_input">
+        <input type="hidden" name="chart_revenue" id="chart_revenue_input">
+    </form>
+
+    <!-- TỔNG QUAN -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3"><div class="card p-3 shadow-sm"><h6>Điểm</h6><h3>{{ total_diem|default:0 }}</h3></div></div>
+        <div class="col-md-3"><div class="card p-3 shadow-sm"><h6>Tour</h6><h3>{{ total_tour|default:0 }}</h3></div></div>
+        <div class="col-md-3"><div class="card p-3 shadow-sm"><h6>Đặt</h6><h3>{{ total_dat_cho|default:0 }}</h3></div></div>
+        <div class="col-md-3"><div class="card p-3 shadow-sm"><h6>Đánh giá</h6><h3>{{ total_danh_gia|default:0 }}</h3></div></div>
+    </div>
+
+    <!-- BIỂU ĐỒ -->
+    <div class="card p-3 mb-4 shadow-sm">
+        <h5>Đặt chỗ theo tháng</h5>
+        <div style="height:300px;">
+            <canvas id="chartMonth"></canvas>
+        </div>
+    </div>
+
+    <div class="card p-3 mb-4 shadow-sm">
+        <h5>Doanh thu theo địa điểm</h5>
+        <div style="height:300px;">
+            <canvas id="chartRevenue"></canvas>
+        </div>
+    </div>
+
+    <!-- BẢNG THEO ĐỊA ĐIỂM -->
+    <h4>📍 Thống kê theo địa điểm & tour</h4>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Địa điểm</th>
+                <th>Tour</th>
+                <th>Số lượt đặt</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in dat_cho_by_diem %}
+            <tr>
+                <td>{{ item.ma_tour__ma_dia_diem__ten_dia_diem }}</td>
+                <td>{{ item.ma_tour__ten_tour }}</td>
+                <td>{{ item.count }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3" class="text-center">Không có dữ liệu</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- TOP 10 -->
+    <h4>🔥 Top 10 địa điểm được đặt nhiều</h4>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Địa điểm</th>
+                <th>Lượt đặt</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in top_diem_dat %}
+            <tr>
+                <td>{{ item.ma_tour__ma_dia_diem__ten_dia_diem }}</td>
+                <td>{{ item.count }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="2" class="text-center">Không có dữ liệu</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- DOANH THU -->
+    <h4>💰 Doanh thu theo địa điểm</h4>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Địa điểm</th>
+                <th>Doanh thu</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in revenue_by_diem %}
+            <tr>
+                <td>{{ item.ma_tour__ma_dia_diem__ten_dia_diem }}</td>
+                <td>{{ item.revenue|default:0|floatformat:0 }} VND</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="2" class="text-center">Không có dữ liệu</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h4>⭐ Số sao được đánh giá</h4>
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Số sao</th>
+                        <th>Số đánh giá</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in danh_gia_by_rating %}
+                        <tr>
+                            <td>{{ item.so_sao }} sao</td>
+                            <td>{{ item.count }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="text-center">Không có đánh giá</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h4>📊 Phân bố đánh giá</h4>
+            <div style="height:300px;">
+                <canvas id="chartRating"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <h4>📝 Bình luận gần nhất</h4>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Người đánh giá</th>
+                <th>Địa điểm</th>
+                <th>Số sao</th>
+                <th>Nội dung</th>
+                <th>Ngày</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comment in comments %}
+            <tr>
+                <td>{{ comment.ma_nguoi_dung.username }}</td>
+                <td>{{ comment.ma_dia_diem.ten_dia_diem }}</td>
+                <td>{{ comment.so_sao }}</td>
+                <td>{{ comment.noi_dung_binh_luan|truncatechars:100 }}</td>
+                <td>{{ comment.ngay_danh_gia|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">Không có bình luận</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<script>
+function exportPDF() {
+    const canvasMonth = document.getElementById('chartMonth');
+    const canvasRevenue = document.getElementById('chartRevenue');
+
+    const form = document.getElementById('exportForm');
+
+    // Chuyển canvas thành base64 và thêm vào form
+    if (canvasMonth) {
+        html2canvas(canvasMonth).then(function(canvas) {
+            const imgData = canvas.toDataURL('image/png');
+            document.getElementById('chart_month_input').value = imgData;
+
+            // Sau khi thêm chart_month, thêm chart_revenue
+            if (canvasRevenue) {
+                html2canvas(canvasRevenue).then(function(canvas2) {
+                    const imgData2 = canvas2.toDataURL('image/png');
+                    document.getElementById('chart_revenue_input').value = imgData2;
+
+                    // Submit form
+                    form.submit();
+                });
+            } else {
+                // Nếu không có chart_revenue, submit luôn
+                form.submit();
+            }
+        });
+    } else {
+        // Nếu không có chart, submit luôn
+        form.submit();
+    }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const monthData = {{ dat_cho_by_month|default:"[]"|safe }};
+    const revenueData = {{ revenue_chart|default:"[]"|safe }};
+
+    // ===== CHART THÁNG =====
+    if (monthData.length) {
+        new Chart(document.getElementById('chartMonth'), {
+            type: 'bar',
+            data: {
+                labels: monthData.map(i => i.month ? i.month.substring(0,7) : ''),
+                datasets: [{
+                    label: 'Lượt đặt',
+                    data: monthData.map(i => i.count)
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // ===== CHART DOANH THU =====
+    if (revenueData.length) {
+        new Chart(document.getElementById('chartRevenue'), {
+            type: 'pie',
+            data: {
+                labels: revenueData.map(i => i.ma_tour__ma_dia_diem__ten_dia_diem),
+                datasets: [{
+                    data: revenueData.map(i => i.revenue || 0),
+                    backgroundColor: [
+                        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    const ratingData = {{ rating_chart|default:"[]"|safe }};
+    if (ratingData.length) {
+        new Chart(document.getElementById('chartRating'), {
+            type: 'pie',
+            data: {
+                labels: ratingData.map(i => `${i.so_sao} sao`),
+                datasets: [{
+                    data: ratingData.map(i => i.count),
+                    backgroundColor: ['#f6c23e', '#1cc88a', '#36b9cc', '#4e73df', '#e74a3b']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+});
+</script>
+
+{% endblock %}
