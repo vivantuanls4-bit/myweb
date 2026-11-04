@@ -64,8 +64,8 @@ def cart(request):
 def cart_detail(request, ma_dat_cho):
     dat_cho = get_object_or_404(DatCho, pk=ma_dat_cho)
     tour = dat_cho.ma_tour
-    # Lấy tên địa điểm đầu tiên (nếu có)
-    dia_diem = tour.ma_dia_diem.first() if tour.ma_dia_diem.exists() else None
+    # Lấy đúng địa điểm đã đặt
+    dia_diem = dat_cho.ma_dia_diem
     return render(request, 'app/cart_detail.html', {
         'dat_cho': dat_cho,
         'tour': tour,
@@ -76,24 +76,34 @@ def cart_detail(request, ma_dat_cho):
 @login_required
 def booking(request):
     initial = {}
-    dia_diem_id = request.GET.get('dia_diem_id')
-    tour_id = request.GET.get('tour_id')
+    dia_diem = None
+    dia_diem_id = request.GET.get('dia_diem_id') or request.POST.get('dia_diem_id')
+    tour_id = request.GET.get('tour_id') or request.POST.get('tour_id')
+    form_kwargs = {}
 
     if tour_id and tour_id.isdigit():
-        tour = TourDuLich.objects.filter(ma_tour=tour_id).first()
-        if tour:
-            initial['ma_tour'] = tour
+        tour_qs = TourDuLich.objects.filter(ma_tour=tour_id)
+        if tour_qs.exists():
+            initial['ma_tour'] = tour_qs.first()
+        form_kwargs['tour_queryset'] = tour_qs
     elif dia_diem_id and dia_diem_id.isdigit():
-        tour = TourDuLich.objects.filter(ma_dia_diem__ma_dia_diem=dia_diem_id).first()
-        if tour:
-            initial['ma_tour'] = tour
+        dia_diem = DiaDiem.objects.filter(ma_dia_diem=dia_diem_id).first()
+        if dia_diem:
+            tour_qs = TourDuLich.objects.filter(ma_dia_diem=dia_diem)
+            if tour_qs.exists():
+                initial['ma_tour'] = tour_qs.first()
+            form_kwargs['tour_queryset'] = tour_qs
 
     if request.method == 'POST':
-        form = BookingForm(request.POST)
+        form = BookingForm(request.POST, **form_kwargs)
         if form.is_valid():
             datCho = form.save(commit=False)
             datCho.ma_nguoi_dung = request.user
             tour = datCho.ma_tour
+            if dia_diem:
+                datCho.ma_dia_diem = dia_diem
+            elif tour.ma_dia_diem.exists():
+                datCho.ma_dia_diem = tour.ma_dia_diem.first()
 
             if tour.so_luong_con_trong <= 0:
                 form.add_error(None, 'Xin lỗi, tour này đã hết chỗ. Vui lòng chọn tour khác.')
@@ -103,9 +113,13 @@ def booking(request):
                 messages.success(request, f'Đặt chỗ thành công. Mã đặt chỗ của bạn là {datCho.ma_dat_cho}.')
                 return redirect('gioHang')
     else:
-        form = BookingForm(initial=initial)
+        form = BookingForm(initial=initial, **form_kwargs)
 
-    return render(request, 'app/booking.html', {'form': form})
+    tour_durations = {str(t.ma_tour): t.thoi_gian for t in form.fields['ma_tour'].queryset}
+    return render(request, 'app/booking.html', {
+        'form': form,
+        'tour_durations': json.dumps(tour_durations)
+    })
 
 
 #giới thiệu
@@ -409,13 +423,14 @@ def report(request):
             temp_dat_cho_qs = dat_cho_qs.filter(
                 ngay_dat__date__range=[start_date, end_date]
             )
-            filtered_dia_diem_ids.update(temp_dat_cho_qs.values_list('ma_tour__ma_dia_diem', flat=True).distinct())
+            filtered_dia_diem_ids.update(temp_dat_cho_qs.values_list('ma_dia_diem', flat=True).distinct())
             dat_cho_qs = temp_dat_cho_qs
 
         if diem_id:
             filtered_dia_diem_ids.add(int(diem_id))
             dat_cho_qs = dat_cho_qs.filter(
-                ma_tour__ma_dia_diem__ma_dia_diem=diem_id
+                Q(ma_dia_diem__ma_dia_diem=diem_id) |
+                Q(ma_tour__ma_dia_diem__ma_dia_diem=diem_id)
             )
             danh_gia_qs = danh_gia_qs.filter(
                 ma_dia_diem__ma_dia_diem=diem_id
@@ -434,7 +449,8 @@ def report(request):
         if filtered_dia_diem_ids:
             dia_diem_qs = dia_diem_qs.filter(ma_dia_diem__in=filtered_dia_diem_ids)
             dat_cho_qs = dat_cho_qs.filter(
-                ma_tour__ma_dia_diem__in=dia_diem_qs
+                Q(ma_dia_diem__in=dia_diem_qs) |
+                Q(ma_tour__ma_dia_diem__in=dia_diem_qs)
             )
             danh_gia_qs = danh_gia_qs.filter(
                 ma_dia_diem__in=dia_diem_qs
@@ -454,20 +470,24 @@ def report(request):
         ).order_by('month')
 
         dat_cho_by_diem = dat_cho_qs.values(
-            'ma_tour__ten_tour',
-            'ma_tour__ma_dia_diem__ten_dia_diem'
+            'ma_dia_diem__ma_dia_diem',
+            'ma_dia_diem__ten_dia_diem',
+            'ma_tour__ma_tour',
+            'ma_tour__ten_tour'
         ).annotate(
             count=Count('ma_dat_cho')
         ).order_by('-count')
 
         top_diem_dat = dat_cho_qs.values(
-            'ma_tour__ma_dia_diem__ten_dia_diem'
+            'ma_dia_diem__ma_dia_diem',
+            'ma_dia_diem__ten_dia_diem'
         ).annotate(
             count=Count('ma_dat_cho')
         ).order_by('-count')[:10]
 
         revenue_by_diem = dat_cho_qs.values(
-            'ma_tour__ma_dia_diem__ten_dia_diem'
+            'ma_dia_diem__ma_dia_diem',
+            'ma_dia_diem__ten_dia_diem'
         ).annotate(
             revenue=Sum('ma_tour__gia')
         ).order_by('-revenue')
@@ -522,11 +542,13 @@ def report(request):
 
             # ===== BẢNG THEO ĐỊA ĐIỂM =====
             elements.append(Paragraph("2. Thống kê theo địa điểm & tour", styles['Heading2']))
-            table_data = [['Địa điểm', 'Tour', 'Số lượt đặt']]
+            table_data = [['Mã địa điểm', 'Địa điểm', 'Mã tour', 'Tour', 'Số lượt đặt']]
             for item in dat_cho_by_diem:
                 table_data.append([
-                    item['ma_tour__ma_dia_diem__ten_dia_diem'],
-                    item['ma_tour__ten_tour'],
+                    item.get('ma_dia_diem__ma_dia_diem', ''),
+                    item.get('ma_dia_diem__ten_dia_diem', ''),
+                    item.get('ma_tour__ma_tour', ''),
+                    item.get('ma_tour__ten_tour', ''),
                     item['count']
                 ])
             table2 = Table(table_data)
@@ -541,10 +563,11 @@ def report(request):
 
             # ===== TOP 10 =====
             elements.append(Paragraph("3. Top 10 địa điểm được đặt nhiều", styles['Heading2']))
-            top_data = [['Địa điểm', 'Lượt đặt']]
+            top_data = [['Mã địa điểm', 'Địa điểm', 'Lượt đặt']]
             for item in top_diem_dat:
                 top_data.append([
-                    item['ma_tour__ma_dia_diem__ten_dia_diem'],
+                    item.get('ma_dia_diem__ma_dia_diem', ''),
+                    item.get('ma_dia_diem__ten_dia_diem', ''),
                     item['count']
                 ])
             table3 = Table(top_data)
@@ -559,10 +582,11 @@ def report(request):
 
             # ===== DOANH THU =====
             elements.append(Paragraph("4. Doanh thu theo địa điểm", styles['Heading2']))
-            revenue_data = [['Địa điểm', 'Doanh thu']]
+            revenue_data = [['Mã địa điểm', 'Địa điểm', 'Doanh thu']]
             for item in revenue_by_diem:
                 revenue_data.append([
-                    item['ma_tour__ma_dia_diem__ten_dia_diem'],
+                    item.get('ma_dia_diem__ma_dia_diem', ''),
+                    item.get('ma_dia_diem__ten_dia_diem', ''),
                     f"{item['revenue'] or 0:,} VND"
                 ])
             table4 = Table(revenue_data)
@@ -729,6 +753,7 @@ def approve_request(request, id):
                 anh_dai_dien=req.anh_dai_dien,
                 ma_nguoi_dung=req.ma_nguoi_dung
             )
+            req.ma_dia_diem = dia_diem
             req.trang_thai = 'approved'
             req.save()
         elif action == 'reject':

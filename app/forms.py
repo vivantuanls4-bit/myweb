@@ -17,12 +17,21 @@ class DanhGiaForm(forms.ModelForm):
 class BookingForm(forms.ModelForm):
     class Meta:
         model = DatCho
-        fields = ['ma_tour', 'start_date', 'end_date']
+        fields = ['ma_tour', 'start_date', 'end_date', 'so_luong_nguoi', 'ghi_chu']
         widgets = {
             'ma_tour': forms.Select(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'so_luong_nguoi': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'ghi_chu': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Ghi chú về yêu cầu của bạn'}),
         }
+
+    def __init__(self, *args, dia_diem=None, tour_queryset=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if tour_queryset is not None:
+            self.fields['ma_tour'].queryset = tour_queryset
+        elif dia_diem is not None:
+            self.fields['ma_tour'].queryset = TourDuLich.objects.filter(ma_dia_diem=dia_diem)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -41,6 +50,10 @@ class BookingForm(forms.ModelForm):
                 so_ngay = (end_date - start_date).days + 1
                 if so_ngay != ma_tour.thoi_gian:
                     raise forms.ValidationError(f'Số ngày của tour phải đúng bằng {ma_tour.thoi_gian} ngày!')
+
+        so_luong_nguoi = cleaned_data.get('so_luong_nguoi')
+        if so_luong_nguoi is None or so_luong_nguoi <= 0:
+            raise forms.ValidationError('Số lượng người không hợp lệ.')
 
         return cleaned_data
 

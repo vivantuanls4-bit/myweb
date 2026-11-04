@@ -95,7 +95,7 @@
                             <h6>{{ danhGia.ma_dia_diem.ten_dia_diem }}</h6>
                             <p>
                                 {% for i in "12345"|make_list %}
-                                    {% if i <= danhGia.so_sao %}
+                                    {% if forloop.counter <= danhGia.so_sao %}
                                         <i class="fas fa-star text-warning"></i>
                                     {% else %}
                                         <i class="far fa-star text-warning"></i>

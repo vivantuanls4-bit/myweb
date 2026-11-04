@@ -10,6 +10,9 @@
         <p><strong>Tên địa điểm:</strong> {% if dia_diem %}{{ dia_diem.ten_dia_diem }}{% else %}Không có địa điểm{% endif %}</p>
         <p><strong>Ngày đi:</strong> {{ dat_cho.start_date|date:"d/m/Y" }}</p>
         <p><strong>Ngày về:</strong> {{ dat_cho.end_date|date:"d/m/Y" }}</p>
+        <p><strong>Số lượng người:</strong> {{ dat_cho.so_luong_nguoi }}</p>
+        <p><strong>Ghi chú:</strong> {{ dat_cho.ghi_chu|default:'Không có' }}</p>
+        <p><strong>Giá tổng:</strong> {{ dat_cho.tong_gia|floatformat:2 }}</p>
         <p><strong>Ngày đặt:</strong> {{ dat_cho.ngay_dat|date:"d/m/Y H:i" }}</p>
         <p><strong>Trạng thái:</strong> 
             {% if dat_cho.trang_thai == 'pending' %}

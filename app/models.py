@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
@@ -83,6 +84,7 @@ class RequestDiaDiem(models.Model):
     dia_chi = models.CharField(max_length=255)
     ma_danh_muc = models.ForeignKey(DanhMuc, on_delete=models.SET_NULL, null=True, blank=True)
     anh_dai_dien = models.ImageField(upload_to='request_dia_diem/', null=True, blank=True)
+    ma_dia_diem = models.ForeignKey(DiaDiem, on_delete=models.SET_NULL, null=True, blank=True, related_name='requests')
     ngay_tao = models.DateTimeField(auto_now_add=True)
     trang_thai = models.CharField(max_length=20, choices=[
         ('pending', 'Đang chờ'),
@@ -103,17 +105,30 @@ class DatCho(models.Model):
     ma_dat_cho = models.AutoField(primary_key=True)
     ma_nguoi_dung = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='dat_cho_list')
     ma_tour = models.ForeignKey(TourDuLich, on_delete=models.CASCADE, related_name='dat_cho_list')
+    ma_dia_diem = models.ForeignKey(DiaDiem, on_delete=models.CASCADE, related_name='dat_cho_list')
     ngay_dat = models.DateTimeField(auto_now_add=True)
     start_date = models.DateField()
-    end_date = models.DateField() # xóa
+    end_date = models.DateField()
+    so_luong_nguoi = models.PositiveIntegerField(default=1, help_text='Số lượng người')
+    ghi_chu = models.TextField(blank=True, null=True)
     trang_thai = models.CharField(max_length=20, choices=[
         ('pending', 'Đang chờ'),
         ('confirmed', 'Đã xác nhận'),
         ('cancelled', 'Đã hủy'),
     ], default='pending')
-    # ghi chú
+    
     def __str__(self):
         return f"Đặt chỗ {self.ma_dat_cho} - {self.ma_nguoi_dung}"
+
+    @property
+    def tong_gia(self):
+        if self.ma_tour and self.so_luong_nguoi:
+            try:
+                quantity = int(self.so_luong_nguoi)
+            except (TypeError, ValueError):
+                quantity = 0
+            return self.ma_tour.gia * quantity
+        return Decimal('0.00')
 
 #BẢNG ĐÁNH_GIÁ
 class DanhGia(models.Model):

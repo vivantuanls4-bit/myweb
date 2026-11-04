@@ -18,6 +18,8 @@
                                     <th>Tour</th>
                                     <th>Ngày đi</th>
                                     <th>Ngày về</th>
+                                    <th>Số người</th>
+                                    <th>Giá</th>
                                     <th>Trạng thái</th>
                                     <th>Ngày đặt</th>
                                 </tr>
@@ -30,6 +32,8 @@
                                     </td>
                                     <td>{{ datCho.start_date|date:"d/m/Y" }}</td>
                                     <td>{{ datCho.end_date|date:"d/m/Y" }}</td>
+                                    <td>{{ datCho.so_luong_nguoi }}</td>
+                                    <td>{{ datCho.tong_gia|floatformat:2 }}</td>
                                     <td>
                                         {% if datCho.trang_thai == 'pending' %}
                                             <span class="badge bg-warning">Đang chờ</span>
