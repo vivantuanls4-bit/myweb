@@ -26,9 +26,7 @@ Dự án nhằm xây dựng một hệ thống website giới thiệu du lịch 
 ## ⚙️ 4. Hướng dẫn cài đặt 
 
 ### Cài đặt python, Django và thư viện
-pip install django
-
-pip install reportlab
+pip install -r requirements.txt
 
 ### Tạo projiect Django
 django-admin startproject webDuLich
@@ -57,3 +55,11 @@ python manage.py runserver
 - Admin: http://127.0.0.1:8000/admin/ 
 - Dịch vụ: http://127.0.0.1:8000/service/
 - Thống kế và báo cáo: http://127.0.0.1:8000/report/
+
+## 7. Triển khai lên Render
+1. Đẩy `render.yaml` ở thư mục gốc lên nhánh `main` trên GitHub.
+2. Trên Render, chọn **New +** → **Blueprint** và kết nối repository này.
+3. Render sẽ tạo web service và PostgreSQL từ Blueprint. `SECRET_KEY` được Render tự tạo; không đưa secret vào Git.
+4. Chờ build/deploy hoàn tất rồi mở URL của web service.
+
+Blueprint chạy migration khi service khởi động và dùng WhiteNoise để phục vụ static files. Database của gói miễn phí có thời hạn theo chính sách Render; các ảnh tải lên cần dịch vụ lưu trữ bền vững riêng vì filesystem của web service không bền vững.

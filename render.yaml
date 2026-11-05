@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: webdulich
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
+    startCommand: python manage.py migrate --noinput && gunicorn webDuLich.wsgi:application
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: webdulich-db
+          property: connectionString
+
+databases:
+  - name: webdulich-db
+    databaseName: webdulich
+    user: webdulich
+    plan: free
