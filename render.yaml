@@ -23,3 +23,4 @@ databases:
     databaseName: webdulich
     user: webdulich
     plan: free
+# Render deployment configuration
