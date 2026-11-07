@@ -156,6 +156,22 @@ MEDIA_URL = '/images/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app/static/images')
 LOGIN_URL = '/login/'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
 # Email configuration for password reset
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development, prints to console
 # For production, use SMTP:
