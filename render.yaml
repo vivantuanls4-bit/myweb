@@ -3,7 +3,7 @@ services:
     name: webdulich
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     startCommand: python manage.py migrate --noinput && gunicorn webDuLich.wsgi:application
     healthCheckPath: /
     envVars:
